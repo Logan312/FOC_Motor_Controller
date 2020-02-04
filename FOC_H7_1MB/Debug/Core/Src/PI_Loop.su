@@ -1,0 +1,2 @@
+PI_Loop.c:22:6:update_foc_pi	32	static
+PI_Loop.c:43:6:update_speed_pi	32	static
