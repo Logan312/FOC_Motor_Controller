@@ -10,6 +10,7 @@
 #define KP_FOC 5
 #define KI_SPEED 0.01
 #define KP_SPEED 1.0
+#define KD_SPEED 0.01
 #define IQ_MAX 20
 static float interrorq=0;
 static float interrord=0;
@@ -17,6 +18,7 @@ static float interrorspeed=0;
 static float errorq_prev = 0;
 static float errord_prev = 0;
 static float errorspeed_prev = 0;
+static float speed_diff = 0;
 static uint32_t last_tic=0;
 static uint32_t last_tic_speed=0;
 int max_speed_int = IQ_MAX/KI_SPEED;
@@ -49,6 +51,8 @@ void update_speed_pi(float *target_speed, float *cur_speed,float *Iq){
 	float output,speed_error_der;
 	last_tic_speed = HAL_GetTick();
 	interrorspeed += error_speed/20000;
+    float diff = (error_speed - errorspeed_prev)/20000;
+    speed_diff = 0.3*speed_diff + 0.7*diff;
     errorspeed_prev = error_speed;
 	if(interrorspeed>max_speed_int){
 		interrorspeed=max_speed_int;
@@ -56,7 +60,7 @@ void update_speed_pi(float *target_speed, float *cur_speed,float *Iq){
 	else if(interrorspeed<-max_speed_int){
 		interrorspeed=-max_speed_int;
 	}
-	output = (interrorspeed*KI_SPEED+error_speed*KP_SPEED);
+	output = (interrorspeed*KI_SPEED+error_speed*KP_SPEED+speed_diff*KD_SPEED);
 	if(output>IQ_MAX){
 		*Iq = IQ_MAX;
 	}
