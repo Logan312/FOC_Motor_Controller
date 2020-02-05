@@ -11,7 +11,7 @@
 #define KI_SPEED 0.01
 #define KP_SPEED 1.0
 #define KD_SPEED 0.01
-#define IQ_MAX 20
+#define IQ_MAX 50
 static float interrorq=0;
 static float interrord=0;
 static float interrorspeed=0;
