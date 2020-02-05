@@ -6,12 +6,13 @@
  */
 #include <PI_Loop.h>
 #define MAX_ERROR
-#define KI_FOC 30
-#define KP_FOC 5
-#define KI_SPEED 0.01
-#define KP_SPEED 1.0
-#define KD_SPEED 0.01
+#define KI_FOC 10
+#define KP_FOC 10
+#define KI_SPEED 0.1
+#define KP_SPEED 1.2
+#define KD_SPEED 0.03
 #define IQ_MAX 50
+#define MAX_V 6000
 static float interrorq=0;
 static float interrord=0;
 static float interrorspeed=0;
@@ -30,21 +31,27 @@ void update_foc_pi(float *target_iq, float *target_id,float *cur_iq,float *cur_i
 	interrord += errord/20000;
     errorq_prev = errorq; //update previous error term
     errord_prev = errord; //update previous error term
-	if(interrorq>150){
-		interrorq=150;
+	if(interrorq>200){
+		interrorq=200;
 	}
-	else if(interrorq<-150){
-		interrorq=-150;
+	else if(interrorq<-200){
+		interrorq=-200;
 	}
-	if(interrord>100){
-		interrord=100;
+	if(interrord>150){
+		interrord=-150;
 	}
-	else if(interrord<-100){
-		interrord=-100;
+	else if(interrord<-150){
+		interrord=-150;
 	}
 	//TODO: pwm saturates at 100% but drivers should not operate 100% so some protection must be added
 	*Vq = (int)(interrorq*KI_FOC+errorq*KP_FOC);
 	*Vd = (int)(interrord*KI_FOC+errord*KP_FOC);
+	if(*Vq>MAX_V){
+			*Vq = MAX_V;
+		}
+		else if(*Vq<-MAX_V){
+				*Vq = -MAX_V;
+		}
 }
 void update_speed_pi(float *target_speed, float *cur_speed,float *Iq){
 	float error_speed = *target_speed-*cur_speed;
