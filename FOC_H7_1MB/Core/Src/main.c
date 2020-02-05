@@ -130,7 +130,7 @@ int main(void)
 	float running_angle_total = 0;
 	float change_in_angle = 0;
 	float curr_speed = 0;
-	float target_speed = 300;
+	float target_speed = 100;
 	uint32_t last_speed_cal_time = 0;
 	int speed_counter = 0;
 	int nop = 0;
@@ -170,7 +170,16 @@ int main(void)
 	HAL_ADC_Start(&hadc2);
 	HAL_TIM_Base_Start_IT(&htim2);
 	HAL_TIM_Base_Start_IT(&htim3);
-	HAL_Delay(500);
+	//prime sensors
+	HAL_Delay(100);
+	for(int primer_counter=0;primer_counter<5;primer_counter++){
+	HAL_SPI_TransmitReceive_IT(&hspi2, (uint8_t*) &request_pos,&position, 1);
+			HAL_SPI_TransmitReceive_IT(&hspi1, (uint8_t*) &nop,
+					(uint8_t*) &raw_curr_data_a, 1);
+			HAL_SPI_TransmitReceive_IT(&hspi3, (uint8_t*) &nop,
+					(uint8_t*) &raw_curr_data_c, 1);
+	}
+	HAL_Delay(100);
   /* USER CODE END 2 */
 
   /* Infinite loop */
